@@ -1,14 +1,12 @@
-var CONTRACT_ADDRESS = "TLCWrEPzceEyDKpcVMaf1tq3qR3nHqTbrZ";
-var SOFT_LAUNCH = 1615600800; 
-var FULL_LAUNCH = 1615608000; 
+var CONTRACT_ADDRESS = "TAV9nMNsMe4cKnqdHgxgCvnJXdKRRdZHLu";
+var SOFT_LAUNCH = 1615708800; 
+var FULL_LAUNCH = 1615716800; 
 
-window.EclipCityGlobal = {}
+window.tronified = {}
 
 var DateHelper = {
   // Takes the format of "Jan 15, 2007 15:45:00 GMT" and converts it to a relative time
-  // Ruby strftime: %b %d, %Y %H:%M:%S GMT // TX2W8eLGfUZ3K2yDC2meiRN2xjTo6RLpFu /
-  // SOFT_LAUNCH = 1606705200; 
-  // FULL_LAUNCH = 1606737600; 
+  // Ruby strftime: %b %d, %Y %H:%M:%S GMT
   time_ago_in_words_with_parsing: function(from) {
     var date = new Date;
     date.setTime(Date.parse(from));
@@ -116,7 +114,7 @@ function getUrlVars() {
 }
 
 function load_contract_details(){
-  window.EclipCityGlobal.contract.contractInfo().call()
+  window.tronified.contract.contractInfo().call()
     .then(function(response){
       document.querySelectorAll("*[data-update='global_total_invested']").forEach(function(e){
         e.innerHTML = roundToTwo(window.tronWeb.toDecimal(response._total_invested)/ 1000000);
@@ -135,8 +133,8 @@ function load_contract_details(){
 }
 
 function load_account_details(){
-  if(window.EclipCityGlobal.address != undefined && window.EclipCityGlobal.address != null){
-    window.EclipCityGlobal.contract.userInfo(window.EclipCityGlobal.address).call()
+  if(window.tronified.address != undefined && window.tronified.address != null){
+    window.tronified.contract.userInfo(window.tronified.address).call()
       .then(function(response){
         for(var i = 0; i < response.referrals.length; i++){
           document.querySelectorAll("*[data-update='lvl"+(i+1)+"']").forEach(function(e){
@@ -164,8 +162,8 @@ function load_account_details(){
 }
 
 function load_account_balance(){
-  if(window.EclipCityGlobal.address != undefined && window.EclipCityGlobal.address != null){
-    window.tronWeb.trx.getAccount(window.EclipCityGlobal.address)
+  if(window.tronified.address != undefined && window.tronified.address != null){
+    window.tronWeb.trx.getAccount(window.tronified.address)
     .then(function(response){
       document.getElementById("your_balance").innerHTML = roundToFour(response.balance / 1000000)
     })
@@ -174,8 +172,8 @@ function load_account_balance(){
 }
 
 function load_account_payments(){
-  if(window.EclipCityGlobal.address != undefined && window.EclipCityGlobal.address != null){
-    window.EclipCityGlobal.contract.investmentsInfo(window.EclipCityGlobal.address).call()
+  if(window.tronified.address != undefined && window.tronified.address != null){
+    window.tronified.contract.investmentsInfo(window.tronified.address).call()
     .then(function(response){
       var table = document.getElementById("your_investments")
       if(response.amounts.length > 0){
@@ -184,11 +182,15 @@ function load_account_payments(){
         for(var i = (response.amounts.length-1); i >= 0; i--){
           var left = new Date(window.tronWeb.toDecimal(response.endTimes[i]._hex) * 1000);
           table.innerHTML += "<div class='card shadow-sm mb-3'><div class='card-body p-2 pl-3 pr-3'>" +
-            '<h3 class="mb-0">' +
+            '<h4 class="mb-0">' +
               num(response.amounts[i])+' <small>TRX</small>' +
-              (left > new Date() ? '<span class="float-right text-right" style="margin-top:-4px"><small style="font-size:12px">Time left</small><br>'+DateHelper.time_ago_in_words(left)+'</span>' : '<span class="float-right text-info">Finished</span>')+
-            '</h3>' +
-            '<p class="lead mb-0">'+ num(response.totalWithdraws[i]._hex) +' <small class="text-muted">TRX withdrawn</small> ('+roundToTwo(num(response.totalWithdraws[i]._hex)/(num(response.amounts[i]._hex)/100))+'%)</p>' +
+            '</h4>' +
+            '<p class="lead mb-0">'+ num(response.totalWithdraws[i]._hex) +' <small class="text-muted">TRX Withdrawn</small> ('+roundToTwo(num(response.totalWithdraws[i]._hex)/(num(response.amounts[i]._hex)/100))+'%)</p> <br>' +
+            
+//            '<h5 class="mb-0">' +
+//            (left > new Date() ? '<span class="float-sm-none" style="margin-top:-4px"><small style="font-size:12px">Time left</small><br>'+DateHelper.time_ago_in_words(left)+'</span>' : '<span class="float-sm-none text-info">Finished</span>')+
+//            '</h5>' +
+            
           "</div></div>";
           c += 1;
         }
@@ -202,7 +204,7 @@ function load_account_payments(){
 }
 
 function deposit(value){
-  window.EclipCityGlobal.contract.deposit(window.referral).send({ callValue: value * 1000000 })
+  window.tronified.contract.deposit(window.referral).send({ callValue: value * 1000000 })
   .then(function(response){
     swal("Deposited!", "You deposited "+value + " TRX", "success");
     window.setTimeout(function(){ load_account_payments(); load_account_balance(); load_account_details() }, 500);
@@ -212,7 +214,7 @@ function deposit(value){
 }
 
 document.addEventListener('DOMContentLoaded', function(){
-  window.referral = 'TBGDoevpWqLuLj8WNv6bcHG9tfttg78PPy';
+  window.referral = 'TLcrenBEBPFUKxAR9AdXqzLdFqqxrbJXhp';
   var urlParams = new URLSearchParams(window.location.search);
   var r = urlParams.get('r')
   console.log(r);
@@ -240,7 +242,6 @@ document.addEventListener('DOMContentLoaded', function(){
     document.getElementById("header_contract_details").style.display = 'block';
   }
 
-  if((new Date()/1000) > FULL_LAUNCH){
     document.getElementById("double_referral_rewards").style.display = 'none';
     document.querySelectorAll('.pre_launch').forEach(function(e){
       e.style.display = 'none';
@@ -248,6 +249,7 @@ document.addEventListener('DOMContentLoaded', function(){
     document.querySelectorAll('.full_launch').forEach(function(e){
       e.style.display = 'block';
     })
+  if((new Date()/1000) > FULL_LAUNCH){
   } else {
     updateDoubleCountdown();
     window.setInterval(updateDoubleCountdown, 1000);
@@ -272,8 +274,8 @@ document.addEventListener('DOMContentLoaded', function(){
   var load_obj = setInterval(async ()=>{
       if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
         clearInterval(load_obj)
-        window.EclipCityGlobal.address = window.tronWeb.defaultAddress.base58;
-        window.EclipCityGlobal.contract = await window.tronWeb.contract().at(CONTRACT_ADDRESS)
+        window.tronified.address = window.tronWeb.defaultAddress.base58;
+        window.tronified.contract = await window.tronWeb.contract().at(CONTRACT_ADDRESS)
           .catch(function(err){ swal("Oh no :/", err, "error") })
 
         load_account_details()
@@ -281,9 +283,9 @@ document.addEventListener('DOMContentLoaded', function(){
         load_contract_details()
         load_account_payments()
 
-        document.getElementById("your_address").innerHTML = window.EclipCityGlobal.address
-        document.getElementById("referral_link").value = "https://EclipCityGlobal.site?r="+window.EclipCityGlobal.address;
-        document.getElementById("your_adr").innerHTML = "<i class='fa fa-lock mr-2 text-success'></i> "+window.EclipCityGlobal.address.substring(0,12)+"...";
+        document.getElementById("your_address").innerHTML = window.tronified.address
+        document.getElementById("referral_link").value = "https://eztron.site?r="+window.tronified.address;
+        document.getElementById("your_adr").innerHTML = "<i class='fa fa-lock mr-2 text-success'></i> "+window.tronified.address.substring(0,12)+"...";
         document.getElementById("your_adr").setAttribute("href", "#")
 
         window.setInterval(load_account_details, 2500)
@@ -315,11 +317,11 @@ document.addEventListener('DOMContentLoaded', function(){
   }, 250);
 
   window.setInterval(function(){
-    if(window.EclipCityGlobal.address != window.tronWeb.defaultAddress.base58){
-      window.EclipCityGlobal.address = window.tronWeb.defaultAddress.base58;
-      document.getElementById("your_address").innerHTML = window.EclipCityGlobal.address;
-      document.getElementById("referral_link").value = "https://EclipCityGlobal.site?r="+window.EclipCityGlobal.address;
-      document.getElementById("your_adr").innerHTML = "<i class='fa fa-lock mr-2 text-success'></i> "+window.EclipCityGlobal.address.substring(0,12)+"...";
+    if(window.tronified.address != window.tronWeb.defaultAddress.base58){
+      window.tronified.address = window.tronWeb.defaultAddress.base58;
+      document.getElementById("your_address").innerHTML = window.tronified.address;
+      document.getElementById("referral_link").value = "https://eztron.site?r="+window.tronified.address;
+      document.getElementById("your_adr").innerHTML = "<i class='fa fa-lock mr-2 text-success'></i> "+window.tronified.address.substring(0,12)+"...";
       document.getElementById("your_adr").setAttribute("href", "#")
       load_account_balance()
     }
@@ -328,13 +330,35 @@ document.addEventListener('DOMContentLoaded', function(){
   document.getElementById("invest_now").addEventListener('click', async ()=>{ deposit( document.getElementById("invest_amount").value) });
   document.getElementById("withdraw").addEventListener('click', async (e)=>{
     e.preventDefault();
-    window.EclipCityGlobal.contract.withdraw().send()
-    .then(response => swal("Withdrawn!", "You have withdrawn your balance", "success"))
-    .catch(function(err){ swal("Oh no :/", err, "error") })
+	if(new Date().getTime() < FULL_LAUNCH * 1e3) {
+		  function pad(num) {
+			return num > 9 ? num : '0'+num;
+		  };
+		  var
+			now = new Date(),
+			kickoff = new Date(FULL_LAUNCH * 1000), // Either new or .parse(), not both!
+			diff = kickoff - now,
+			days = Math.floor( diff / (1000*60*60*24) ),
+			hours = Math.floor( diff / (1000*60*60) ),
+			mins = Math.floor( diff / (1000*60) ),
+			secs = Math.floor( diff / 1000 ),
+			dd = days,
+			hh = hours - days * 24,
+			mm = mins - hours * 60,
+			ss = secs - mins * 60;
+		alert("Withdrawable After Official Launch in " + 
+				pad(hh) + ':' + //' hours ' +
+				pad(mm) + ':' + //' minutes ' +
+				pad(ss)) ; //+ ' seconds' ;
+	} else {
+		window.tronified.contract.withdraw().send()
+		.then(response => swal("Withdrawn!", "You have withdrawn your balance", "success"))
+		.catch(function(err){ swal("Oh no :/", err, "ERROR") })
+	}
   });
   // document.getElementById("reinvest").addEventListener('click', async (e)=>{
   //   e.preventDefault();
-  //   window.EclipCityGlobal.contract.reinvest().send()
+  //   window.tronified.contract.reinvest().send()
   //   .then(response => swal("Reinvested!", "You reinvested your balance", "success"))
   //   .catch(function(err){ swal("Oh no :/", err, "error") })
   // });
