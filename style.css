@@ -16,7 +16,8 @@ strong {font-weight:800}
   opacity: 10;
   position: absolute;
   left:0; top:0; right:0; bottom:0;
-  background: url(images/empire.gif);
+  background: url(images/bg.jpg);
+  background-size: cover;
 }
 .jumbotron.light::before {
   opacity: 10;
